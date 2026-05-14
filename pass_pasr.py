@@ -1,13 +1,12 @@
 import sympy as sp
-import random
 
 paps = sp.Symbol('paps')
 pbps = sp.Symbol('pbps')
 papr = 1 - pbps
 pbpr = 1 - paps
 
-pajs = paps**4 * (1 + 4 * pbpr + 10 * pbpr**2) + (20 * paps**5 * pbpr**3)/(1 - 2 * paps * pbpr)
-pajr = papr**4 * (1 + 4 * pbps + 10 * pbps**2) + (20 * papr**5 * pbps**3)/(1 - 2 * papr * pbps)
+pajs = sp.Symbol('pajs')
+pajr = sp.Symbol('pajr')
 pbjs = 1 - pajr
 pbjr = 1 - pajs
 
@@ -134,41 +133,19 @@ def pTB_resta(i,j):
     return 0
 
 h3 = (paps * papr) / (1 - (paps * pbps + papr * pbpr)) # = h3'
-print(f'h3 = {h3}')
 paTBS = sum(pTB(7,j) for j in range(6)) + pTB(6,6) * h3
-print(f'paTBS = {paTBS}')
 paTBR = sum(pTB_resta(7,j) for j in range(6)) + pTB_resta(6,6) * h3
-print(f'paTBR = {paTBR}')
+
+diferencia_tbs = paTBS - paTBR
+print("Diferencia entre paTBS y paTBR (debería ser 0):")
+print(diferencia_tbs.simplify())
 
 
-paSS = sum(pS(6,j) for j in range(5)) + pS(5,5) * (pajs * pajr + (pajs * pbjs + pajr * pbjr) * paTBS)
-print(f'pass = {paSS}')
-paSR = sum(pS_resta(6,j) for j in range(5)) + pS_resta(5,5) * (pajr * pajs + (pajr * pbjr + pajs * pbjs) * paTBR)
-print(f'pasr = {paSR}')
-print("Iniciando demostración computacional por evaluación masiva...")
-exito = True
 
-# Probamos 100 combinaciones aleatorias diferentes de probabilidades
-for i in range(100):
-    # Generamos probabilidades aleatorias realistas para el tenis (entre 40% y 90%)
-    val_paps = random.uniform(0.4, 0.9)
-    val_pbps = random.uniform(0.4, 0.9)
-    
-    # Sustituimos las letras por los números usando .subs() y evaluamos con .evalf()
-    # Metemos las variables en un diccionario para la sustitución
-    eval_SS = paSS.subs({paps: val_paps, pbps: val_pbps}).evalf()
-    eval_SR = paSR.subs({paps: val_paps, pbps: val_pbps}).evalf()
-    
-    # Restamos y redondeamos a 5 decimales para evitar el error de coma flotante de Python
-    diferencia = round(float(abs(eval_SS - eval_SR)), 5)
-    
-    if diferencia != 0.0:
-        exito = False
-        print(f"Fallo encontrado con paps={val_paps} y pbps={val_pbps}")
-        break
+paSSDirecto = sum(pS(6,j) for j in range(5)) + pS(5,5)
+paSRDirecto = sum(pS_resta(6,j) for j in range(5)) + pS_resta(5,5)
 
-if exito:
-    print("-" * 60)
-    print("¡TEOREMA DEMOSTRADO COMPUTACIONALMENTE!")
-    print("Para 100 escenarios aleatorios, la diferencia entre paSS y paSR es exactamente 0.0")
-    print("-" * 60)
+diferencia_directa = paSSDirecto - paSRDirecto
+print("Diferencia directa entre paSSDirecto y paSRDirecto (debería ser 0):")
+print(diferencia_directa.simplify())
+
